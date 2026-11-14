@@ -1,1 +1,5 @@
 /build/
+.env
+notes.md
+bgnet_usl_c_1.pdf
+examples.md

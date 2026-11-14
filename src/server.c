@@ -4,7 +4,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 
-int server_init(void)
+int server_init(char *run_port)
 {
     struct addrinfo hints = {0};
     struct addrinfo *server_info;
@@ -13,7 +13,7 @@ int server_init(void)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    int status = getaddrinfo(NULL, "80", &hints, &server_info);
+    int status = getaddrinfo(NULL, run_port, &hints, &server_info);
 
     if (status != 0)
     {
@@ -44,12 +44,13 @@ int server_init(void)
     return 0;
 }
 
-int server_listen(void)
+int server_listen(int *file_descriptors, int max_listeners)
 {
     int running = 1;
 
     while (running)
     {
+        running = 0;
     }
 
     return 0;

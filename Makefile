@@ -8,18 +8,19 @@ CFLAGS += -D_DEFAULT_SOURCE
 SRC = $(wildcard src/*.c)
 TEST = $(wildcard test/*.c)
 
-TARGET = build/program
+TARGET = build/ccwebserver
+ARGS ?=
+
+.PHONY: all clean run
 
 all: $(TARGET)
 
 $(TARGET): $(SRC) $(TEST)
-	mkdir -p build
-	$(CC) $(CFLAGS) $(SRC) $(TEST) -o $(TARGET)
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
 	rm -rf build
 
 run: all
-	./$(TARGET)
-
-.PHONY: all clean run
+	./$(TARGET) $(ARGS)
