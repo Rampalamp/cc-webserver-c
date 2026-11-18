@@ -43,7 +43,36 @@ static CommandType parse_command(const char *command_input)
 
 static void run_help()
 {
-    printf("Help...\n");
+    printf("It's dangerous to go alone! Take this.\n");
+    printf("Accepts 5 case sensisitive commands...\n");
+    printf("\n");
+    printf("help\n");
+    printf("\t-Displays this message so you dont have to go alone.\n");
+    printf("listen\n");
+    printf(
+        "\tListen to outputs from desired socket. Accepts one parameter with two valid "
+        "inputs, sock1 and sock2. Examples:\n"
+    );
+    printf("\t\tlisten sock1\n");
+    printf("\t\tlisten sock2\n");
+    printf("stop\n");
+    printf(
+        "\tStop/shutdown the desired socket file descriptor. Accepts one parameter with two "
+        "valid inputs, sock1 and sock2. Examples:\n"
+    );
+    printf("\t\tstop sock1\n");
+    printf("\t\tstop sock2\n");
+    printf("start\n");
+    printf(
+        "\tStart the desired socket file descriptor. Accepts two possible parameters, the "
+        "first one (socket identifier) is required, the second is port number to listen on. "
+        "If no port is specified it will start on 8080 by default. First parameter accepts two"
+        "valid inputs, sock1 and sock2. Examples:\n"
+    );
+    printf("\t\tstart sock1 8096\n");
+    printf("\t\tstart sock2\n");
+    printf("exit\n");
+    printf("\tShutdown sockets and exit program.\n");
 }
 
 static void run_listen(const char *listen_arg)
@@ -66,8 +95,9 @@ static void run_exit()
     printf("Exit...\n");
 }
 
-int handle_user_command(const char *command_input)
+int handle_user_command(char *command_input)
 {
+    command_input[strcspn(command_input, "\r\n")] = '\0';
 
     switch (parse_command(command_input)) {
         case COMMAND_HELP:
@@ -84,7 +114,8 @@ int handle_user_command(const char *command_input)
             run_start();
             break;
         case COMMAND_EXIT:
-            run_start();
+            run_exit();
+            return 1;
         case COMMAND_UNKNOWN:
         default:
             printf("Command Unknown...\n");
