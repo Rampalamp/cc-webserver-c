@@ -10,7 +10,8 @@
 
 #define MAX_LISTENERS 2
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     char *port;
 
     if (argc == 1) {
@@ -19,9 +20,7 @@ int main(int argc, char *argv[]) {
         port = argv[1];
     } else {
         fprintf(stderr, "Usage: %s port\n", argv[0]);
-        fprintf(
-            stderr, "Default: If no port is supplied port 8080 will be used."
-        );
+        fprintf(stderr, "Default: If no port is supplied port 8080 will be used.");
         exit(EXIT_FAILURE);
     }
     // Ignore SIGPIPE: failed writes return EPIPE
@@ -61,13 +60,10 @@ int main(int argc, char *argv[]) {
     );
 
     struct pollfd watched_descriptors[MAX_LISTENERS + 1];
-    watched_descriptors[0] =
-        (struct pollfd){.fd = STDIN_FILENO, .events = POLLIN};
-    for (int listener_index = 0; listener_index < listener_count;
-         listener_index++)
-        watched_descriptors[listener_index + 1] = (struct pollfd){
-            .fd = listener_socket_fds[listener_index], .events = POLLIN
-        };
+    watched_descriptors[0] = (struct pollfd){.fd = STDIN_FILENO, .events = POLLIN};
+    for (int listener_index = 0; listener_index < listener_count; listener_index++)
+        watched_descriptors[listener_index + 1] =
+            (struct pollfd){.fd = listener_socket_fds[listener_index], .events = POLLIN};
 
     int should_quit = 0;
     fputs("> ", stdout);
@@ -93,12 +89,15 @@ int main(int argc, char *argv[]) {
                 fflush(stdout);
             }
         }
+
+        for (int descriptor_index = 1; descriptor_index <= listener_count; descriptor_index++)
+            if (watched_descriptors[descriptor_index].revents & POLLIN)
+                server_accept_conn();
     }
 
     if (server_shutdown() != 0) {
         fprintf(stderr, "Failed while calling server_shutdown.\n");
         exit(EXIT_FAILURE);
     }
-
     exit(EXIT_SUCCESS);
 }
