@@ -1,26 +1,66 @@
 CC = gcc
 
-CFLAGS = -Wall -Wextra -std=c17 -Iinclude
+CPPFLAGS = -Iinclude -D_POSIX_C_SOURCE=200809L -D_DEFAULT_SOURCE -MMD -MP
+CFLAGS = -std=c17 -Wall -Wextra
 
-CFLAGS += -D_POSIX_C_SOURCE=200809L
-CFLAGS += -D_DEFAULT_SOURCE
+# Usage: make (debug, the default) or make BUILD=release
+BUILD ?= debug
 
-SRC = $(wildcard src/*.c)
-TEST = $(wildcard test/*.c)
+ifeq ($(BUILD),debug)
+    CFLAGS += -g -O0 -fsanitize=address,undefined
+    LDFLAGS += -fsanitize=address,undefined
+else ifeq ($(BUILD),release)
+    CFLAGS += -O2
+    CPPFLAGS += -DNDEBUG
+else
+    $(error BUILD must be 'debug' or 'release')
+endif
 
-TARGET = build/ccwebserver
+BUILD_DIRECTORY = build/$(BUILD)
+
+SOURCE_FILES = $(wildcard src/*.c)
+OBJECT_FILES = $(SOURCE_FILES:src/%.c=$(BUILD_DIRECTORY)/%.o)
+
+TEST_SOURCE_FILES = $(wildcard test/*.c)
+TEST_OBJECT_FILES = $(TEST_SOURCE_FILES:test/%.c=$(BUILD_DIRECTORY)/test_%.o)
+
+# Everything except main.c, so tests can link against the server code
+LIBRARY_OBJECT_FILES = $(filter-out $(BUILD_DIRECTORY)/main.o,$(OBJECT_FILES))
+
+DEPENDENCY_FILES = $(OBJECT_FILES:.o=.d) $(TEST_OBJECT_FILES:.o=.d)
+
+TARGET = $(BUILD_DIRECTORY)/ccwebserver
+TEST_TARGET = $(BUILD_DIRECTORY)/run_tests
 ARGS ?=
 
-.PHONY: all clean run
+.PHONY: all release test run clean
 
 all: $(TARGET)
 
-$(TARGET): $(SRC) $(TEST)
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) $^ -o $@
+release:
+	$(MAKE) BUILD=release all
+
+$(TARGET): $(OBJECT_FILES)
+	$(CC) $(LDFLAGS) $^ -o $@
+
+$(TEST_TARGET): $(TEST_OBJECT_FILES) $(LIBRARY_OBJECT_FILES)
+	$(CC) $(LDFLAGS) $^ -o $@
+
+$(BUILD_DIRECTORY)/%.o: src/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIRECTORY)/test_%.o: test/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+test: $(TEST_TARGET)
+	./$(TEST_TARGET)
+
+run: all
+	./$(TARGET) $(ARGS)
 
 clean:
 	rm -rf build
 
-run: all
-	./$(TARGET) $(ARGS)
+-include $(DEPENDENCY_FILES)
