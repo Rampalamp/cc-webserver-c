@@ -118,7 +118,7 @@ int handle_user_command(char *command_input)
             return 1;
         case COMMAND_UNKNOWN:
         default:
-            printf("Command Unknown...\n");
+            printf("Command Unknown... Type 'help' to see options.\n");
             break;
     }
 

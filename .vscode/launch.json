@@ -6,7 +6,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/debug/ccwebserver",
-      "args": ["-p", "8080"],
+      "args": ["-p 8080", "-l 5"],
       "cwd": "${workspaceFolder}",
       "environment": [],
       "MIMode": "gdb",
