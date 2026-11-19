@@ -13,7 +13,7 @@ int server_init(char *run_port)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    printf("Gathering server information...");
+    printf("Gathering server information...\n");
     int status = getaddrinfo(NULL, run_port, &hints, &server_info);
 
     if (status != 0) {
@@ -37,10 +37,10 @@ int server_init(char *run_port)
         printf(" Protocol:    %d\n", current->ai_protocol);
         printf(" Address:    %s\n", host);
         printf(" Port:    %s\n\n", service);
-        printf("\n");
+        printf("\n\n\n");
         printf("Binding socket...\n");
-        //do bind work or make a private function to do it.
-        printf("Address Information %d socket bound.", count);
+        // do bind work or make a private function to do it.
+        printf("Address Information %d socket bound.\n\n\n", count);
     }
 
     freeaddrinfo(server_info);
