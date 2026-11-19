@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ccutils/cc_parser.h>
 
 #define MAX_LISTENERS 2
 
@@ -17,6 +18,10 @@ int main(int argc, char *argv[])
     if (argc == 1) {
         port = "8080";
     } else if (argc == 2) {
+        if(!ccp_parse_int(argv[1],NULL)){
+            fprintf(stderr, "%s is not a valid port number.\n", argv[1]);
+            exit(EXIT_FAILURE);
+        }
         port = argv[1];
     } else {
         fprintf(stderr, "Usage: %s port\n", argv[0]);

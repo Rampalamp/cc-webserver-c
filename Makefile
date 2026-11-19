@@ -16,6 +16,10 @@ else
     $(error BUILD must be 'debug' or 'release')
 endif
 
+CPPFLAGS += -I$(HOME)/.local/include
+LDFLAGS += -L$(HOME)/.local/lib
+LDLIBS = -lccutils
+
 BUILD_DIRECTORY = build/$(BUILD)
 
 SOURCE_FILES = $(wildcard src/*.c)
@@ -41,10 +45,10 @@ release:
 	$(MAKE) BUILD=release all
 
 $(TARGET): $(OBJECT_FILES)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 $(TEST_TARGET): $(TEST_OBJECT_FILES) $(LIBRARY_OBJECT_FILES)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 $(BUILD_DIRECTORY)/%.o: src/%.c
 	@mkdir -p $(@D)
